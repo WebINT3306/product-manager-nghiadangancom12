@@ -266,11 +266,7 @@
 
     // Format price with Vietnamese formatting
     function formatPrice(price) {
-      return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-        minimumFractionDigits: 0
-      }).format(price);
+      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     // Escape HTML special characters
@@ -314,8 +310,6 @@
 
     // Add product
     function addProduct(event) {
-      event.preventDefault();
-      
       const nameInput = document.querySelector('#input-name');
       const categoryInput = document.querySelector('#input-category');
       const priceInput = document.querySelector('#input-price');
