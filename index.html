@@ -4,8 +4,355 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý Sản phẩm</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .form-section {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 6px;
+      margin-bottom: 30px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .form-section h2 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    
+    .form-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    
+    .form-item {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .form-item label {
+      margin-bottom: 5px;
+      color: #555;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .form-item input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    .form-item input:focus {
+      outline: none;
+      border-color: #0066cc;
+      background-color: #f0f8ff;
+    }
+    
+    #btn-add {
+      padding: 10px 20px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    
+    #btn-add:hover {
+      background-color: #0052a3;
+    }
+    
+    #btn-add:active {
+      transform: scale(0.98);
+    }
+    
+    .table-section {
+      margin-top: 30px;
+    }
+    
+    .table-section h2 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    
+    #product-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    #product-table thead {
+      background-color: #0066cc;
+      color: white;
+    }
+    
+    #product-table th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s ease;
+    }
+    
+    #product-table th:hover {
+      background-color: #0052a3;
+    }
+    
+    #product-table tbody tr:nth-child(odd) {
+      background-color: #f9f9f9;
+    }
+    
+    #product-table tbody tr:nth-child(even) {
+      background-color: #ffffff;
+    }
+    
+    #product-table tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+    
+    #product-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    #product-table td:first-child {
+      text-align: center;
+      font-weight: 500;
+    }
+    
+    .price, .quantity {
+      text-align: right;
+    }
+    
+    .sort-indicator {
+      margin-left: 8px;
+      font-size: 12px;
+    }
+    
+    .error-message {
+      color: #d32f2f;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Quản lý Sản phẩm</h1>
+    
+    <div class="form-section">
+      <h2>Thêm sản phẩm mới</h2>
+      <form id="add-product-form" onsubmit="addProduct(event)">
+        <div class="form-group">
+          <div class="form-item">
+            <label for="input-name">Tên sản phẩm</label>
+            <input type="text" id="input-name" placeholder="Nhập tên..." required>
+          </div>
+          <div class="form-item">
+            <label for="input-category">Danh mục</label>
+            <input type="text" id="input-category" placeholder="Nhập danh mục...">
+          </div>
+          <div class="form-item">
+            <label for="input-price">Đơn giá</label>
+            <input type="number" id="input-price" placeholder="0" min="0" required>
+          </div>
+          <div class="form-item">
+            <label for="input-quantity">Số lượng</label>
+            <input type="number" id="input-quantity" placeholder="0" min="1" required>
+          </div>
+          <button type="button" id="btn-add" onclick="addProduct(event)">Thêm</button>
+        </div>
+      </form>
+    </div>
+    
+    <div class="table-section">
+      <h2>Danh sách sản phẩm</h2>
+      <table id="product-table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th id="name-header">Tên sản phẩm <span class="sort-indicator"></span></th>
+            <th>Danh mục</th>
+            <th>Đơn giá</th>
+            <th>Số lượng</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
+  <script>
+    let products = [];
+    let sortAscending = true;
+    const nextId = 7;
+
+    // Load products from JSON
+    function loadProducts() {
+      const xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          products = JSON.parse(xhr.responseText);
+          renderTable();
+        }
+      };
+      xhr.open('GET', 'products.json');
+      xhr.send();
+    }
+
+    // Render products table
+    function renderTable() {
+      const tbody = document.querySelector('#product-table tbody');
+      tbody.innerHTML = '';
+      
+      products.forEach((product, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${escapeHtml(product.name)}</td>
+          <td>${escapeHtml(product.category)}</td>
+          <td class="price">${formatPrice(product.price)}</td>
+          <td class="quantity">${product.quantity}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Format price with Vietnamese formatting
+    function formatPrice(price) {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        minimumFractionDigits: 0
+      }).format(price);
+    }
+
+    // Escape HTML special characters
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Sort table by product name
+    function sortByName() {
+      if (sortAscending) {
+        products.sort((a, b) => a.name.localeCompare(b.name));
+      } else {
+        products.sort((a, b) => b.name.localeCompare(a.name));
+      }
+      sortAscending = !sortAscending;
+      updateSortIndicator();
+      renderTable();
+    }
+
+    // Update sort indicator
+    function updateSortIndicator() {
+      const indicator = document.querySelector('#name-header .sort-indicator');
+      if (products.length === 0) {
+        indicator.textContent = '';
+      } else if (!sortAscending) {
+        indicator.textContent = '▲';
+      } else {
+        indicator.textContent = '▼';
+      }
+    }
+
+    // Add product
+    function addProduct(event) {
+      event.preventDefault();
+      
+      const name = document.querySelector('#input-name').value.trim();
+      const category = document.querySelector('#input-category').value.trim();
+      const price = parseFloat(document.querySelector('#input-price').value);
+      const quantity = parseInt(document.querySelector('#input-quantity').value);
+
+      // Validation
+      if (name.length < 3) {
+        alert('Tên sản phẩm phải có ít nhất 3 ký tự');
+        return;
+      }
+      if (price <= 0) {
+        alert('Đơn giá phải là số dương');
+        return;
+      }
+      if (quantity < 1 || !Number.isInteger(quantity)) {
+        alert('Số lượng phải là số nguyên ≥ 1');
+        return;
+      }
+
+      // Add new product
+      const newProduct = {
+        id: Math.max(...products.map(p => p.id), 0) + 1,
+        name: name,
+        category: category || 'Chưa phân loại',
+        price: price,
+        quantity: quantity
+      };
+
+      products.push(newProduct);
+      
+      // Reset form
+      document.querySelector('#input-name').value = '';
+      document.querySelector('#input-category').value = '';
+      document.querySelector('#input-price').value = '';
+      document.querySelector('#input-quantity').value = '';
+      
+      renderTable();
+    }
+
+    // Sort click listener
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('name-header').addEventListener('click', sortByName);
+      loadProducts();
+    });
+  </script>
 </body>
 </html>
