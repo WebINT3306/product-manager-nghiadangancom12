@@ -223,7 +223,7 @@
           <td>${index + 1}</td>
           <td>${product.name}</td>
           <td>${product.category || 'Chưa phân loại'}</td>
-          <td>${product.price}</td>
+          <td>${product.price.toLocaleString('vi-VN')}</td>
           <td>${product.quantity}</td>
         `;
         tbody.appendChild(tr);
